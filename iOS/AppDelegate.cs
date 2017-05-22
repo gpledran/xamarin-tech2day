@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-using Foundation;
+﻿using Foundation;
+using Timer.iOS.Services;
+using Timer.Messages;
 using UIKit;
+using Xamarin.Forms;
 
 namespace Timer.iOS
 {
@@ -16,7 +15,24 @@ namespace Timer.iOS
 
             LoadApplication(new App());
 
+            WireUpTimerTask();
+
             return base.FinishedLaunching(app, options);
         }
+
+        TimerTask timerTask;
+		void WireUpTimerTask()
+		{
+            MessagingCenter.Subscribe<StartTimerMessage>(this, nameof(StartTimerMessage), async message =>
+			{
+                timerTask = new TimerTask();
+                await timerTask.Start();
+			});
+
+            MessagingCenter.Subscribe<StopTimerMessage>(this, nameof(StopTimerMessage), message =>
+			{
+				timerTask.Stop();
+			});
+		}
     }
 }
