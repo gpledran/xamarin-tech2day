@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using MyOptimo.iOS;
 using Timer.Messages;
 using Timer.Tasks;
 using UIKit;
@@ -10,8 +11,11 @@ namespace Timer.iOS.Services
 {
     public class TimerTask
     {
+        static int NotificationIdServiceInProgress = 17;
+
 		nint taskId;
         CancellationTokenSource cancellationTokenSource;
+        NotificationManager notificationManager;
 
         public async Task Start()
         {
@@ -19,8 +23,15 @@ namespace Timer.iOS.Services
 
             taskId = UIApplication.SharedApplication.BeginBackgroundTask(nameof(TimerTask), OnExpiration);
 
+            notificationManager = new NotificationManager();
+
             try
             {
+				MessagingCenter.Subscribe<TickMessage>(this, nameof(TickMessage), message =>
+				{
+                    notificationManager.Show("Timer is running:", message.Message, NotificationIdServiceInProgress);
+				});
+
                 var counter = new CounterTask();
                 await counter.Run(cancellationTokenSource.Token);
             }
@@ -35,6 +46,7 @@ namespace Timer.iOS.Services
                     {
                         MessagingCenter.Send(message, nameof(CancelMessage));
                     });
+                    MessagingCenter.Unsubscribe<CounterTask, TickMessage>(this, nameof(TickMessage));
                 }
             }
 

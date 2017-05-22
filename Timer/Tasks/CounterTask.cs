@@ -12,7 +12,7 @@ namespace Timer.Tasks
         {
             await Task.Run(async () =>
             {
-                for (long i = 0; i < long.MaxValue; i++)
+                for (long i = 1; i < long.MaxValue; i++)
                 {
 					token.ThrowIfCancellationRequested();
 					
