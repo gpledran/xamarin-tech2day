@@ -2,16 +2,15 @@
 <ContentPage 
     xmlns="http://xamarin.com/schemas/2014/forms" 
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
-    xmlns:local="clr-namespace:Timer" 
-    x:Class="Timer.TimerPage">
+    x:Class="Timer.Views.TimerPage">
     <StackLayout
         VerticalOptions="CenterAndExpand"
         HorizontalOptions="CenterAndExpand">
         <Button 
-            x:Name="start"
-            Text="Start" />
+            Command="{Binding StartStopCommand}"
+            Text="{Binding ButtonText}" />
         <Label
-            x:Name="timer"
-            FontSize="Medium" />
+            Text="{Binding FormattedTimer}"
+            FontSize="Large" />
     </StackLayout>
 </ContentPage>

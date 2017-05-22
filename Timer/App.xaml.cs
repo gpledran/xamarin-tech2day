@@ -1,4 +1,5 @@
 ﻿using Xamarin.Forms;
+using Timer.Views;
 
 namespace Timer
 {
