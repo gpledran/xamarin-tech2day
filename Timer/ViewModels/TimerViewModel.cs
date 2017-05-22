@@ -8,8 +8,8 @@ namespace Timer.ViewModels
 {
     public class TimerViewModel : BaseViewModel
     {
-        public bool IsRunning { get; set; }
-        public ICommand StartStopCommand { get; set; }
+        public bool IsRunning { get; private set; }
+        public ICommand StartStopCommand { get; private set; }
 
         string buttonText;
 		public string ButtonText

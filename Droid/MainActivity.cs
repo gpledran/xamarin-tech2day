@@ -7,6 +7,9 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using Android.OS;
+using Timer.Droid.Services;
+using Xamarin.Forms;
+using Timer.Messages;
 
 namespace Timer.Droid
 {
@@ -23,6 +26,23 @@ namespace Timer.Droid
             global::Xamarin.Forms.Forms.Init(this, bundle);
 
             LoadApplication(new App());
+
+            WireUpTimerTask();
         }
-    }
+
+		void WireUpTimerTask()
+		{
+			MessagingCenter.Subscribe<StartTimerMessage>(this, nameof(StartTimerMessage), message =>
+			{
+                var intent = new Intent(this, typeof(TimerTask));
+				StartService(intent);
+			});
+
+			MessagingCenter.Subscribe<StopTimerMessage>(this, nameof(StopTimerMessage), message =>
+			{
+                var intent = new Intent(this, typeof(TimerTask));
+				StopService(intent);
+			});
+		}
+	}
 }

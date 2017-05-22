@@ -11,6 +11,7 @@
             Text="{Binding ButtonText}" />
         <Label
             Text="{Binding FormattedTimer}"
+            HorizontalTextAlignment="Center"
             FontSize="Large" />
     </StackLayout>
 </ContentPage>
