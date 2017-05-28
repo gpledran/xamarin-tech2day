@@ -27,13 +27,13 @@ namespace Timer.iOS
         TimerTask timerTask;
 		void WireUpTimerTask()
 		{
-            MessagingCenter.Subscribe<StartTimerMessage>(this, nameof(StartTimerMessage), async message =>
+            MessagingCenter.Subscribe<StartMessage>(this, nameof(StartMessage), async message =>
 			{
                 timerTask = new TimerTask();
                 await timerTask.Start();
 			});
 
-            MessagingCenter.Subscribe<StopTimerMessage>(this, nameof(StopTimerMessage), message =>
+            MessagingCenter.Subscribe<StopMessage>(this, nameof(StopMessage), message =>
 			{
 				timerTask.Stop();
 			});

@@ -27,7 +27,7 @@ namespace Timer.iOS.Services
 
             try
             {
-				MessagingCenter.Subscribe<TickMessage>(this, nameof(TickMessage), message =>
+				MessagingCenter.Subscribe<ProgressMessage>(this, nameof(ProgressMessage), message =>
 				{
                     notificationManager.Show("Timer is running:", message.Message, NotificationIdServiceInProgress);
 				});
@@ -46,7 +46,7 @@ namespace Timer.iOS.Services
                     {
                         MessagingCenter.Send(message, nameof(CancelMessage));
                     });
-                    MessagingCenter.Unsubscribe<CounterTask, TickMessage>(this, nameof(TickMessage));
+                    MessagingCenter.Unsubscribe<CounterTask, ProgressMessage>(this, nameof(ProgressMessage));
                 }
             }
 

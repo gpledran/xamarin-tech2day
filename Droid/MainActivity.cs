@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 
 using Android.App;
 using Android.Content;
@@ -32,13 +32,13 @@ namespace Timer.Droid
 
 		void WireUpTimerTask()
 		{
-			MessagingCenter.Subscribe<StartTimerMessage>(this, nameof(StartTimerMessage), message =>
+			MessagingCenter.Subscribe<StartMessage>(this, nameof(StartMessage), message =>
 			{
                 var intent = new Intent(this, typeof(TimerTask));
 				StartService(intent);
 			});
 
-			MessagingCenter.Subscribe<StopTimerMessage>(this, nameof(StopTimerMessage), message =>
+			MessagingCenter.Subscribe<StopMessage>(this, nameof(StopMessage), message =>
 			{
                 var intent = new Intent(this, typeof(TimerTask));
 				StopService(intent);

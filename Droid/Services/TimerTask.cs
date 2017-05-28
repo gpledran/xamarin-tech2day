@@ -1,4 +1,4 @@
-﻿using System.Threading;
+﻿﻿using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
@@ -29,7 +29,7 @@ namespace Timer.Droid.Services
 			{
 				try
 				{
-					MessagingCenter.Subscribe<TickMessage>(this, nameof(TickMessage), message =>
+					MessagingCenter.Subscribe<ProgressMessage>(this, nameof(ProgressMessage), message =>
 					{
 						notificationManager.Notify(NotificationIdServiceInProgress,
 												   GetNotificationBuilder(message.Message).Build());
@@ -49,7 +49,7 @@ namespace Timer.Droid.Services
                         Device.BeginInvokeOnMainThread(() => {
                             MessagingCenter.Send(message, nameof(CancelMessage));
 						});
-						MessagingCenter.Unsubscribe<CounterTask, TickMessage>(this, nameof(TickMessage));
+						MessagingCenter.Unsubscribe<CounterTask, ProgressMessage>(this, nameof(ProgressMessage));
                         notificationManager.Cancel(NotificationIdServiceInProgress);
 					}
 				}

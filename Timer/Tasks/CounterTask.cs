@@ -17,14 +17,14 @@ namespace Timer.Tasks
 					token.ThrowIfCancellationRequested();
 					
 					await Task.Delay(1000);
-					var message = new TickMessage
+					var message = new ProgressMessage
 					{
                         Message = new DateTime(TimeSpan.FromSeconds(i).Ticks).ToString("mm:ss")
 					};
                     					
 					Device.BeginInvokeOnMainThread(() => 
 					{
-						MessagingCenter.Send(message, nameof(TickMessage));
+						MessagingCenter.Send(message, nameof(ProgressMessage));
 					});
                 }
             }, token);

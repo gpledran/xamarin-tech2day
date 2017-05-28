@@ -35,7 +35,7 @@ namespace Timer.ViewModels
 
 		void HandleReceivedTickMessages()
 		{
-			MessagingCenter.Subscribe<TickMessage>(this, nameof(TickMessage), message =>
+			MessagingCenter.Subscribe<ProgressMessage>(this, nameof(ProgressMessage), message =>
 			{
 				FormattedTimer = message.Message;
 			});
@@ -49,15 +49,15 @@ namespace Timer.ViewModels
 
             if (IsRunning)
             {
-                var message = new StopTimerMessage();
-				MessagingCenter.Send(message, nameof(StopTimerMessage));
+                var message = new StopMessage();
+				MessagingCenter.Send(message, nameof(StopMessage));
                 IsRunning = false;
 				ButtonText = "Start";
             }
             else
             {
-				var message = new StartTimerMessage();
-				MessagingCenter.Send(message, nameof(StartTimerMessage));
+				var message = new StartMessage();
+				MessagingCenter.Send(message, nameof(StartMessage));
                 IsRunning = true;
                 ButtonText = "Stop";
             }

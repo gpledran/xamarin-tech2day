@@ -36,9 +36,9 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Messages\StartTimerMessage.cs" />
-    <Compile Include="Messages\StopTimerMessage.cs" />
-    <Compile Include="Messages\TickMessage.cs" />
+    <Compile Include="Messages\StartMessage.cs" />
+    <Compile Include="Messages\StopMessage.cs" />
+    <Compile Include="Messages\ProgressMessage.cs" />
     <Compile Include="Tasks\CounterTask.cs" />
     <Compile Include="Messages\CancelMessage.cs" />
     <Compile Include="Views\TimerPage.xaml.cs">
