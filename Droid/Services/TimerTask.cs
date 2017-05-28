@@ -1,11 +1,11 @@
-﻿﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Support.V4.App;
 using Timer.Messages;
-using Timer.Tasks;
 using Xamarin.Forms;
 
 namespace Timer.Droid.Services
@@ -22,21 +22,11 @@ namespace Timer.Droid.Services
 		{
 			cancellationTokenSource = new CancellationTokenSource();
 
-			NotificationCompat.Builder builder = GetNotificationBuilder();
-			notificationManager = (NotificationManager)GetSystemService(NotificationService);
-
 			Task.Run(() =>
 			{
 				try
 				{
-					MessagingCenter.Subscribe<ProgressMessage>(this, nameof(ProgressMessage), message =>
-					{
-						notificationManager.Notify(NotificationIdServiceInProgress,
-												   GetNotificationBuilder(message.Message).Build());
-					});
-
-					var counter = new CounterTask();
-                    counter.Run(cancellationTokenSource.Token).Wait();
+                    RunTimer(cancellationTokenSource.Token).Wait();
 				}
 				catch (Android.Accounts.OperationCanceledException)
 				{
@@ -45,11 +35,6 @@ namespace Timer.Droid.Services
 				{
                     if (cancellationTokenSource.IsCancellationRequested)
 					{
-						var message = new CancelMessage();
-                        Device.BeginInvokeOnMainThread(() => {
-                            MessagingCenter.Send(message, nameof(CancelMessage));
-						});
-						MessagingCenter.Unsubscribe<CounterTask, ProgressMessage>(this, nameof(ProgressMessage));
                         notificationManager.Cancel(NotificationIdServiceInProgress);
 					}
 				}
@@ -67,6 +52,29 @@ namespace Timer.Droid.Services
                 cancellationTokenSource.Cancel();
             }
 			base.OnDestroy();
+		}
+
+		public async Task RunTimer(CancellationToken token)
+		{
+           
+            NotificationCompat.Builder builder = GetNotificationBuilder();
+            notificationManager = (NotificationManager)GetSystemService(NotificationService);
+
+			await Task.Run(async () =>
+			{
+				for (long i = 1; i < long.MaxValue; i++)
+				{
+					token.ThrowIfCancellationRequested();
+
+					await Task.Delay(1000);
+
+					var message = new ProgressMessage { Message = new DateTime(TimeSpan.FromSeconds(i).Ticks).ToString("mm:ss") };
+
+					notificationManager.Notify(NotificationIdServiceInProgress, GetNotificationBuilder(message.Message).Build());
+
+					Device.BeginInvokeOnMainThread(() => MessagingCenter.Send(message, nameof(ProgressMessage)));
+				}
+			}, token);
 		}
 
 		NotificationCompat.Builder GetNotificationBuilder(string content = "00:00")

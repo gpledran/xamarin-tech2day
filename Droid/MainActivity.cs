@@ -1,11 +1,6 @@
-﻿﻿using System;
-
-using Android.App;
+﻿using Android.App;
 using Android.Content;
 using Android.Content.PM;
-using Android.Runtime;
-using Android.Views;
-using Android.Widget;
 using Android.OS;
 using Timer.Droid.Services;
 using Xamarin.Forms;
@@ -27,10 +22,10 @@ namespace Timer.Droid
 
             LoadApplication(new App());
 
-            WireUpTimerTask();
+            ManageTimerTask();
         }
 
-		void WireUpTimerTask()
+		void ManageTimerTask()
 		{
 			MessagingCenter.Subscribe<StartMessage>(this, nameof(StartMessage), message =>
 			{

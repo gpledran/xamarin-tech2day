@@ -30,10 +30,10 @@ namespace Timer.ViewModels
             ButtonText = "Start";
             FormattedTimer = "00:00";
             StartStopCommand = new Command(StartStopTimer);
-            HandleReceivedTickMessages();
+            SubscibeToMessages();
         }
 
-		void HandleReceivedTickMessages()
+		void SubscibeToMessages()
 		{
 			MessagingCenter.Subscribe<ProgressMessage>(this, nameof(ProgressMessage), message =>
 			{
@@ -49,15 +49,13 @@ namespace Timer.ViewModels
 
             if (IsRunning)
             {
-                var message = new StopMessage();
-				MessagingCenter.Send(message, nameof(StopMessage));
+				MessagingCenter.Send(new StopMessage(), nameof(StopMessage));
                 IsRunning = false;
 				ButtonText = "Start";
             }
             else
             {
-				var message = new StartMessage();
-				MessagingCenter.Send(message, nameof(StartMessage));
+				MessagingCenter.Send(new StartMessage(), nameof(StartMessage));
                 IsRunning = true;
                 ButtonText = "Stop";
             }

@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using MyOptimo.iOS;
 using Timer.Messages;
-using Timer.Tasks;
 using UIKit;
 using Xamarin.Forms;
 
@@ -23,32 +22,11 @@ namespace Timer.iOS.Services
 
             taskId = UIApplication.SharedApplication.BeginBackgroundTask(nameof(TimerTask), OnExpiration);
 
-            notificationManager = new NotificationManager();
-
             try
             {
-				MessagingCenter.Subscribe<ProgressMessage>(this, nameof(ProgressMessage), message =>
-				{
-                    notificationManager.Show("Timer is running:", message.Message, NotificationIdServiceInProgress);
-				});
-
-                var counter = new CounterTask();
-                await counter.Run(cancellationTokenSource.Token);
+                await RunTimer(cancellationTokenSource.Token);
             }
-            catch (OperationCanceledException)
-            {}
-            finally
-            {
-                if (cancellationTokenSource.IsCancellationRequested)
-                {
-                    var message = new CancelMessage();
-                    Device.BeginInvokeOnMainThread(() => 
-                    {
-                        MessagingCenter.Send(message, nameof(CancelMessage));
-                    });
-                    MessagingCenter.Unsubscribe<CounterTask, ProgressMessage>(this, nameof(ProgressMessage));
-                }
-            }
+            catch (OperationCanceledException) {}
 
             UIApplication.SharedApplication.EndBackgroundTask(taskId);
         }
@@ -61,6 +39,27 @@ namespace Timer.iOS.Services
         void OnExpiration()
 		{
             cancellationTokenSource.Cancel();
+		}
+
+		public async Task RunTimer(CancellationToken token)
+		{
+            notificationManager = new NotificationManager();
+
+			await Task.Run(async () =>
+			{
+				for (long i = 1; i < long.MaxValue; i++)
+				{
+					token.ThrowIfCancellationRequested();
+
+					await Task.Delay(1000);
+
+					var message = new ProgressMessage { Message = new DateTime(TimeSpan.FromSeconds(i).Ticks).ToString("mm:ss") };
+
+					notificationManager.Show("Timer is running:", message.Message, NotificationIdServiceInProgress);
+
+					Device.BeginInvokeOnMainThread(() => MessagingCenter.Send(message, nameof(ProgressMessage)));
+				}
+			}, token);
 		}
     }
 }

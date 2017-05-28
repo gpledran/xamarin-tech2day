@@ -39,8 +39,6 @@
     <Compile Include="Messages\StartMessage.cs" />
     <Compile Include="Messages\StopMessage.cs" />
     <Compile Include="Messages\ProgressMessage.cs" />
-    <Compile Include="Tasks\CounterTask.cs" />
-    <Compile Include="Messages\CancelMessage.cs" />
     <Compile Include="Views\TimerPage.xaml.cs">
       <DependentUpon>TimerPage.xaml</DependentUpon>
     </Compile>
@@ -65,7 +63,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Messages\" />
-    <Folder Include="Tasks\" />
     <Folder Include="Views\" />
     <Folder Include="ViewModels\" />
   </ItemGroup>
