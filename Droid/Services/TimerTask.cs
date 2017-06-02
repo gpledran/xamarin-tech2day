@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
@@ -17,6 +18,7 @@ namespace Timer.Droid.Services
 
         CancellationTokenSource cancellationTokenSource;
         NotificationManager notificationManager;
+        IDisposable timer;
 
 		public override StartCommandResult OnStartCommand(Intent intent, StartCommandFlags flags, int startId)
 		{
@@ -50,30 +52,29 @@ namespace Timer.Droid.Services
             {                
                 cancellationTokenSource.Token.ThrowIfCancellationRequested();
                 cancellationTokenSource.Cancel();
+                timer.Dispose();
             }
 			base.OnDestroy();
 		}
 
 		public async Task RunTimer(CancellationToken token)
 		{
-           
             NotificationCompat.Builder builder = GetNotificationBuilder();
             notificationManager = (NotificationManager)GetSystemService(NotificationService);
 
-			await Task.Run(async () =>
+			await Task.Run(() =>
 			{
-				for (long i = 1; i < long.MaxValue; i++)
+				timer = Observable.Interval(TimeSpan.FromSeconds(1))
+				.Subscribe(s =>
 				{
 					token.ThrowIfCancellationRequested();
 
-					await Task.Delay(1000);
+					var progress = new ProgressMessage { Message = new DateTime(TimeSpan.FromSeconds(s).Ticks).ToString("mm:ss") };
 
-					var message = new ProgressMessage { Message = new DateTime(TimeSpan.FromSeconds(i).Ticks).ToString("mm:ss") };
+					notificationManager.Notify(NotificationIdServiceInProgress, GetNotificationBuilder(progress.Message).Build());
 
-					notificationManager.Notify(NotificationIdServiceInProgress, GetNotificationBuilder(message.Message).Build());
-
-					Device.BeginInvokeOnMainThread(() => MessagingCenter.Send(message, nameof(ProgressMessage)));
-				}
+					MessagingCenter.Send(progress, nameof(ProgressMessage));
+				});
 			}, token);
 		}
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MyOptimo.iOS;
@@ -15,6 +16,7 @@ namespace Timer.iOS.Services
 		nint taskId;
         CancellationTokenSource cancellationTokenSource;
         NotificationManager notificationManager;
+        IDisposable timer;
 
         public async Task Start()
         {
@@ -33,32 +35,33 @@ namespace Timer.iOS.Services
 
         public void Stop()
         {
-            cancellationTokenSource.Cancel();
+			cancellationTokenSource.Cancel();
+			timer.Dispose();
         }
 		
         void OnExpiration()
 		{
-            cancellationTokenSource.Cancel();
+			cancellationTokenSource.Cancel();
+			timer.Dispose();
 		}
 
 		public async Task RunTimer(CancellationToken token)
 		{
             notificationManager = new NotificationManager();
 
-			await Task.Run(async () =>
+			await Task.Run(() =>
 			{
-				for (long i = 1; i < long.MaxValue; i++)
+				timer = Observable.Interval(TimeSpan.FromSeconds(1))
+				.Subscribe(s =>
 				{
-					token.ThrowIfCancellationRequested();
+                    token.ThrowIfCancellationRequested();
 
-					await Task.Delay(1000);
-
-					var message = new ProgressMessage { Message = new DateTime(TimeSpan.FromSeconds(i).Ticks).ToString("mm:ss") };
+					var message = new ProgressMessage { Message = new DateTime(TimeSpan.FromSeconds(s).Ticks).ToString("mm:ss") };
 
 					notificationManager.Show("Timer is running:", message.Message, NotificationIdServiceInProgress);
 
-					Device.BeginInvokeOnMainThread(() => MessagingCenter.Send(message, nameof(ProgressMessage)));
-				}
+					MessagingCenter.Send(message, nameof(ProgressMessage));
+				});
 			}, token);
 		}
     }
