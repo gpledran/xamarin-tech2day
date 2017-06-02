@@ -30,16 +30,7 @@ namespace Timer.Droid.Services
 				{
                     RunTimer(cancellationTokenSource.Token).Wait();
 				}
-				catch (Android.Accounts.OperationCanceledException)
-				{
-				}
-				finally
-				{
-                    if (cancellationTokenSource.IsCancellationRequested)
-					{
-                        notificationManager.Cancel(NotificationIdServiceInProgress);
-					}
-				}
+				catch (Android.Accounts.OperationCanceledException) {}
 
             }, cancellationTokenSource.Token);
 
@@ -52,7 +43,6 @@ namespace Timer.Droid.Services
             {                
                 cancellationTokenSource.Token.ThrowIfCancellationRequested();
                 cancellationTokenSource.Cancel();
-                timer.Dispose();
             }
 			base.OnDestroy();
 		}
@@ -67,14 +57,18 @@ namespace Timer.Droid.Services
 				timer = Observable.Interval(TimeSpan.FromSeconds(1))
 				.Subscribe(s =>
 				{
-					token.ThrowIfCancellationRequested();
-
 					var progress = new ProgressMessage { Message = new DateTime(TimeSpan.FromSeconds(s).Ticks).ToString("mm:ss") };
 
 					notificationManager.Notify(NotificationIdServiceInProgress, GetNotificationBuilder(progress.Message).Build());
 
 					MessagingCenter.Send(progress, nameof(ProgressMessage));
 				});
+
+                cancellationTokenSource.Token.Register(() => 
+                {
+                    timer.Dispose();
+                    notificationManager.Cancel(NotificationIdServiceInProgress);
+                });
 			}, token);
 		}
 
